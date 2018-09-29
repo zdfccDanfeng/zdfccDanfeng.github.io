@@ -28,6 +28,7 @@ tags:
 &emsp;对spark而言：Job=多个stage，Stage=多个同种task, Task分为ShuffleMapTask和ResultTask，Dependency分为ShuffleDependency和NarrowDependency
   具体图示如下：
   ![image](https://zdfccdanfeng.github.io/img/we.png)
+  
 
 
 ##   Spark作业当调度执行流程：
@@ -38,6 +39,8 @@ tags:
 - Driver完成SparkContext初始化，继续执行application程序，当执行到Action时，就会创建Job。并且由DAGScheduler将Job划分多个Stage,每个Stage 由TaskSet 组成，并将TaskSet提交给taskScheduler,taskScheduler把TaskSet中的task依次提交给Executor, Executor在接收到task之后，会使用taskRunner（封装task的线程池）来封装task,然后，从Executor的线程池中取出一个线程来执行task
 - 就这样Spark的每个Stage被作为TaskSet提交给Executor执行，每个Task对应一个RDD的partition,执行我们的定义的算子和函数。直到所有操作执行完为止。如下图所示：
 ![image](https://upload-images.jianshu.io/upload_images/2119554-19572064cd1d37eb.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/462/format/webp)
+
+&emsp;Stage的划分不仅根据RDD的依赖关系，还有一个原则是将依赖链断开，每个stage内部可以并行运行，整个作业按照stage顺序依次执行，最终完成整个Job。
 
 
 
