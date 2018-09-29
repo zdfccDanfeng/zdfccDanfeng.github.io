@@ -12,7 +12,7 @@ github_repo: "https://github.com/zdfccDanfeng/zdfccDanfeng.github.io.git" # you 
 # Sidebar settings
 sidebar: true                           # whether or not using Sidebar.
 sidebar-about-description: "Goals determine what you going to be!"
-sidebar-avatar: /img/about-BY-gentle.jpg      # use absolute URL, seeing it's used in both `/` and `/about/`
+sidebar-avatar: https://avatars0.githubusercontent.com/u/11978292?s=460&v=4      # use absolute URL, seeing it's used in both `/` and `/about/`
 
 
 
@@ -72,7 +72,7 @@ gitalk:
 
 # Analytics settings
 # Baidu Analytics
-ba_track_id: b50bf2b12b5338a1845e33832976fd68
+ba_track_id: #
 
 # Google Analytics
 ga_track_id: 'UA-90855596-1'            # Format: UA-xxxxxx-xx
@@ -98,7 +98,7 @@ service-worker: true
 friends: [
     {
         title: "WY",
-        href: "http://zhengwuyang.com"
+        href: "#"
     },{
         title: "简书·BY",
         href: "http://www.jianshu.com/u/e71990ada2fd"
