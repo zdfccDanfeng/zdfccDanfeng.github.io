@@ -27,5 +27,5 @@ tags:
 
 &emsp;对spark而言：Job=多个stage，Stage=多个同种task, Task分为ShuffleMapTask和ResultTask，Dependency分为ShuffleDependency和NarrowDependency
   具体图示如下：
-  ![image](https://images2015.cnblogs.com/blog/1004194/201608/1004194-20160829182313371-1648664691.png)
+  ![image](https://zdfccdanfeng.github.io/img/we.png)
 
