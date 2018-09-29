@@ -52,4 +52,5 @@ tags:
   
   
 ![image]实际划分时，DAGScheduler就是根据DAG图，从图的末端逆向遍历整个依赖链，一般是以一次shuffle为边界来划分的。一般划分stage是从程序执行流程的最后往前划分，遇到宽依赖就断开，遇到窄依赖就将将其加入当前stage中。一个典型的RDD Graph如下图所示：其中实线框是RDD，RDD内的实心矩形是各个分区，实线箭头表示父子分区间依赖关系，虚线框表示stage。针对下图流程首先根据最后一步join（宽依赖）操作来作为划分stage的边界，再往左走，A和B之间有个group by也为宽依赖，也可作为stage划分的边界，所以我们将下图划分为三个stage。
-
+![image](https://zdfccdanfeng.github.io/img/shuffl.png)
+  
