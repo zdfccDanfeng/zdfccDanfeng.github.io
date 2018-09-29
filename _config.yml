@@ -60,8 +60,8 @@ kramdown:
 # Gitalk
 gitalk:
   enable: true    #是否开启Gitalk评论
-  clientID: 0f7f591dade552ec9599                            #生成的clientID
-  clientSecret: 9857ea2b9d472abb7078707a4d299af0885b2dd2    #生成的clientSecret
+  clientID: e0d24cad9d42328cb2b4                            #生成的clientID
+  clientSecret: 02b49ef25143d1770fcfc3ab745b584b5eea509d    #生成的clientSecret
   repo: zdfccDanfeng.github.io    #仓库名称
   owner: zdfccDanfeng    #github用户名
   admin: zdfccDanfeng
@@ -97,16 +97,7 @@ service-worker: true
 # Friends
 friends: [
     {
-        title: "WY",
+        title: "ME",
         href: "#"
-    },{
-        title: "简书·BY",
-        href: "http://www.jianshu.com/u/e71990ada2fd"
-    },{
-        title: "Apple",
-        href: "https://apple.com"
-    },{
-        title: "Apple Developer",
-        href: "https://developer.apple.com/"
     }
 ]
