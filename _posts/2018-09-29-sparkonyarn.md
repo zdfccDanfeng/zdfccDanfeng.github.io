@@ -44,7 +44,10 @@ tags:
 
 
 
+## 为什么Spark将依赖分为窄依赖和宽依赖？
+（1） 窄依赖（narrow dependencies）可以支持在同一个集群Executor上，以pipeline管道形式顺序执行多条命令，**也就是可以做到同一个分区内的数据局部并行执行**例如在执行了map后，紧接着执行filter。分区内的计算收敛，不需要依赖所有分区的数据，可以并行地在不同节点进行计算。所以它的失败恢复也更有效，因为它只需要重新计算丢失的parent partition即可
 
+（2）宽依赖（shuffle dependencies） 则需要所有的父分区都是可用的，必须等RDD的parent partition数据全部ready之后才能开始计算，可能还需要调用类似MapReduce之类的操作进行跨节点传递。从失败恢复的角度看，shuffle dependencies 牵涉RDD各级的多个parent partition。
 
   
   
