@@ -97,7 +97,7 @@ service-worker: true
 # Friends
 friends: [
     {
-        title: "ME",
-        href: "#"
+        title: "hadoop小🤴",
+        href: "https://hanzheng02.github.io/"
     }
 ]
