@@ -1,0 +1,17 @@
+---
+layout:     post
+title:      数据倾斜优化
+subtitle:   数据倾斜优化
+date:       2018-10-10
+author:     danfeng
+header-img: img/post-bg-ios10.jpg
+catalog: 	 true
+tags:
+    - SPARK
+    - BIGDATA
+---       
+
+   &emsp;在大数据处理时候，基于MapReduce的思想，通常是分而治之，将数据分割，然后并行处理，这样每一个executor只需要处理自己所负责的那一部分数据即可，这样各个
+executor就可以同处理一小部分工作，加快大数据处理，这一切看上去很美好，但是不可 避免的存在极端情况下，数据在各个executor上分布不均，导致个别executor
+数据远大于其他节点，导致executor负载不均衡，从而拖慢整体处理进度，严重情况下很可能平时几分钟就可以完成的任务导致最终几个小时也没有出结果甚至OOM错误。
+因此数据倾斜的处理很关键，。
