@@ -60,3 +60,7 @@ tags:
 - 当Reducer启动时，它会根据自己task的id和所依赖的Mapper的id从远端或是本地的block manager中取得相应的bucket作为Reducer的输入进行处理。
 <br>
 当map端执行完毕后，会把执行的结果信息（磁盘小文件的位置，最终执行的状态等）封装到mapstatus中，然后会调用MapOutputTeackWorker向MapOutputTeackMaster上，此时Master上有所有磁盘小文件的信息，其他task想用这些数据，调用自身的MapOutputTeackWorker向主节点申请位置信息即可
+接着Spark会将ArrayBuffer中的Map输出结果写入block manager所管理的磁盘中，这里文件的命名方式为： shuffle_ + shuffle_id + "_" + map partition id + "_" + shuffle partition id。
+早期的shuffle write有两个比较大的问题：
+Map的输出必须先全部存储到内存中，然后写入磁盘。这对内存是一个非常大的开销，当内存不足以存储所有的Map output时就会出现OOM。
+每一个Mapper都会产生Reducer number个shuffle文件，如果Mapper个数是1k，Reducer个数也是1k，那么就会产生1M个shuffle文件，这对于文件系统是一个非常大的负担。同时在shuffle数据量不大而shuffle文件又非常多的情况下，随机写也会严重降低IO的性能。
