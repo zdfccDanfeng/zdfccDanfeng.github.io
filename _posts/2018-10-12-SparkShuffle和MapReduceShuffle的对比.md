@@ -58,4 +58,5 @@ tags:
 - 首先每一个Mapper会根据Reducer的数量创建出相应的bucket，bucket的数量是MXR，其中\(M\)是Map的个数，\(R\)是Reduce的个数。
 - 其次Mapper产生的结果会根据设置的partition算法填充到每个bucket中去。这里的partition算法是可以自定义的，当然默认的算法是根据key哈希到不同的bucket中去。
 - 当Reducer启动时，它会根据自己task的id和所依赖的Mapper的id从远端或是本地的block manager中取得相应的bucket作为Reducer的输入进行处理。
-
+<br>
+当map端执行完毕后，会把执行的结果信息（磁盘小文件的位置，最终执行的状态等）封装到mapstatus中，然后会调用MapOutputTeackWorker向MapOutputTeackMaster上，此时Master上有所有磁盘小文件的信息，其他task想用这些数据，调用自身的MapOutputTeackWorker向主节点申请位置信息即可
