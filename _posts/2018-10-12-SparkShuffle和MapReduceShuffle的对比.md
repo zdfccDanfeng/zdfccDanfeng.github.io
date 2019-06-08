@@ -24,8 +24,10 @@ tags:
 从Map输出到Reduce输入的整个过程可以广义地称为Shuffle。Shuffle横跨Map端和Reduce端，在Map端包括Spill过程，在Reduce端包括copy和sort过程
  ![image](https://static.open-open.com/lib/uploadImg/20140521/20140521222449_182.jpg)
  
-  #### Map端shuffle 
+      Map端shuffle 
   
  &emsp;&emsp;每个map task都有一个内存缓冲区，存储着map的输出结果，当缓冲区快满的时候需要将缓冲区的数据以一个临时文件的方式存放到磁盘，当整个map task结束后再对磁盘中这个map task产生的所有临时文件做合并，生成最终的正式输出文件，然后等待reduce task来拉数据。
 <br>![image](http://dl.iteye.com/upload/attachment/456529/641c4f01-6c9d-322c-b428-9981866d86a6.jpg)
-
+  -  step1: 根据输入文件的split数目 ，创建map task，split的数目和map task的数目一一对应。
+  -  step2: map task运行的结果是一个个的k-v对，需要发送到reduce结点进行规约操作， MapReduce提供Partitioner接口，它的作用就是根据key或value及reduce的数量来决定当前的这对输出数据最终应该交由哪个reduce task处理。默认对key hash后再以reduce task数量取模。默认的取模方式只是为了平均reduce的处理能力，如果用户自己对Partitioner有需求，可以订制并设置到job上。
+  -  step3: spill操作：包括sort ,combine（可选） ,merge操作。这一步的主要目的是由于Map task的结果经过Pattioner之后会写入到内存缓冲区中，缓冲区的作用是批量收集map结果，减少磁盘IO的影响。我们的key/value对以及Partition的结果都会被写入缓冲区。当然写入之前，key与value值都会被序列化成字节数组，整个内存缓冲区就是一个环形字节数组。
