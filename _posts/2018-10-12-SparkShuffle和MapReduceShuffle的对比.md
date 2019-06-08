@@ -11,3 +11,6 @@ tags:
     - BIGDATA
     - SPARK
 --- 
+
+### MR Shuffle
+在正式的分析SparkShuffle之前，先梳理下MR的shuffle流程。
