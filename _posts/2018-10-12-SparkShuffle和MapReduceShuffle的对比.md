@@ -23,3 +23,4 @@ tags:
 
 从Map输出到Reduce输入的整个过程可以广义地称为Shuffle。Shuffle横跨Map端和Reduce端，在Map端包括Spill过程，在Reduce端包括copy和sort过程
  ![image](https://static.open-open.com/lib/uploadImg/20140521/20140521222449_182.jpg)
+![image](http://dl.iteye.com/upload/attachment/456529/641c4f01-6c9d-322c-b428-9981866d86a6.jpg)
