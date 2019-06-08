@@ -24,6 +24,8 @@ tags:
 从Map输出到Reduce输入的整个过程可以广义地称为Shuffle。Shuffle横跨Map端和Reduce端，在Map端包括Spill过程，在Reduce端包括copy和sort过程
  ![image](https://static.open-open.com/lib/uploadImg/20140521/20140521222449_182.jpg)。首先界定下shuffle在整个MR操作过程中的边界：
   开始时间：map执行完成有输出文件产生，shuffle开始；结束时间：reduce输入文件最终确定了，shuffle结束；
+  
+  
       Map端shuffle 
   
  &emsp;&emsp;每个map task都有一个内存缓冲区，存储着map的输出结果，当缓冲区快满的时候需要将缓冲区的数据以一个临时文件的方式存放到磁盘，当整个map task结束后再对磁盘中这个map task产生的所有临时文件做合并，生成最终的正式输出文件，然后等待reduce task来拉数据。
