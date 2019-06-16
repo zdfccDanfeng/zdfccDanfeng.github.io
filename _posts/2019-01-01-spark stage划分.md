@@ -131,3 +131,59 @@ DAGScheduler 完成stage的划分后基于每个Stage生成TaskSet，并提交�
     }
   }
 ```
+
+下面通过代码 看stage 的具体划分细节：
+``` java
+ private[scheduler] def handleJobSubmitted(jobId: Int,
+      finalRDD: RDD[_],
+      func: (TaskContext, Iterator[_]) => _,
+      partitions: Array[Int],
+      callSite: CallSite,
+      listener: JobListener,
+      properties: Properties) {
+    var finalStage: ResultStage = null
+    try {
+      // New stage creation may throw an exception if, for example, jobs are run on a
+      // HadoopRDD whose underlying HDFS files have been deleted.
+      finalStage = createResultStage(finalRDD, func, partitions, jobId, callSite)
+    } catch {
+      case e: Exception =>
+        logWarning("Creating new stage failed due to exception - job: " + jobId, e)
+        listener.jobFailed(e)
+        return
+    }
+
+    val job = new ActiveJob(jobId, finalStage, callSite, listener, properties)
+    clearCacheLocs()
+    logInfo("Got job %s (%s) with %d output partitions".format(
+      job.jobId, callSite.shortForm, partitions.length))
+    logInfo("Final stage: " + finalStage + " (" + finalStage.name + ")")
+    logInfo("Parents of final stage: " + finalStage.parents)
+    logInfo("Missing parents: " + getMissingParentStages(finalStage))
+
+    val jobSubmissionTime = clock.getTimeMillis()
+    jobIdToActiveJob(jobId) = job
+    activeJobs += job
+    finalStage.setActiveJob(job)
+    val stageIds = jobIdToStageIds(jobId).toArray
+    val stageInfos = stageIds.flatMap(id => stageIdToStage.get(id).map(_.latestInfo))
+    listenerBus.post(
+      SparkListenerJobStart(job.jobId, jobSubmissionTime, stageInfos, properties))
+
+    if (isContinuous) {
+      // TODO: make "spark.streaming.totalShuffleNumber" as a val string
+      val value = properties.getProperty("spark.streaming.totalShuffleNumber")
+      assert(value != null && value.nonEmpty, "totalShuffleNumber must be set!")
+      // For continuou processing submit, in this case, we submit all stages at once
+      // instead of the origin submission in which child stages must be submitted only
+      // after parent stages complete success
+      submitAllStagesOnce(finalStage)
+    } else {
+      submitStage(finalStage)
+    }
+  }
+
+```
+
+
+
