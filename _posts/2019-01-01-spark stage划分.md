@@ -17,6 +17,31 @@ DAGScheduler 完成stage的划分后基于每个Stage生成TaskSet，并提交�
 ![img](https://upload-images.jianshu.io/upload_images/3597066-fc535e47d140e361.png?imageMogr2/auto-orient/)
 
 ```java
+ // 当遇到action算子 ，触发job提交
+ def runJob[T, U](
+      rdd: RDD[T],
+      func: (TaskContext, Iterator[T]) => U,
+      partitions: Seq[Int],
+      callSite: CallSite,
+      resultHandler: (Int, U) => Unit,
+      properties: Properties): Unit = {
+    val start = System.nanoTime
+    val waiter = submitJob(rdd, func, partitions, callSite, resultHandler, properties)
+    ThreadUtils.awaitReady(waiter.completionFuture, Duration.Inf)
+    waiter.completionFuture.value.get match {
+      case scala.util.Success(_) =>
+        logInfo("Job %d finished: %s, took %f s".format
+          (waiter.jobId, callSite.shortForm, (System.nanoTime - start) / 1e9))
+      case scala.util.Failure(exception) =>
+        logInfo("Job %d failed: %s, took %f s".format
+          (waiter.jobId, callSite.shortForm, (System.nanoTime - start) / 1e9))
+        // SPARK-8644: Include user stack trace in exceptions coming from DAGScheduler.
+        val callerStackTrace = Thread.currentThread().getStackTrace.tail
+        exception.setStackTrace(exception.getStackTrace ++ callerStackTrace)
+        throw exception
+    }
+  }
+  
  /** Submits stage, but first recursively submits any missing parents. */
   private def submitStage(stage: Stage) {
     val jobId = activeJobForStage(stage)
