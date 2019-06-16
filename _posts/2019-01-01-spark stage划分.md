@@ -145,6 +145,7 @@ DAGScheduler 完成stage的划分后基于每个Stage生成TaskSet，并提交�
     try {
       // New stage creation may throw an exception if, for example, jobs are run on a
       // HadoopRDD whose underlying HDFS files have been deleted.
+      // Stage划分过程是从最后一个Stage开始往前执行的，最后一个Stage的类型是ResultStage
       finalStage = createResultStage(finalRDD, func, partitions, jobId, callSite)
     } catch {
       case e: Exception =>
