@@ -75,7 +75,38 @@ DAGScheduler 完成stage的划分后基于每个Stage生成TaskSet，并提交�
       SerializationUtils.clone(properties)))
     waiter
   }
+  private def doOnReceive(event: DAGSchedulerEvent): Unit = event match {
+    case JobSubmitted(jobId, rdd, func, partitions, callSite, listener, properties) =>
+      dagScheduler.handleJobSubmitted(jobId, rdd, func, partitions, callSite, listener, properties)
 
+    case MapStageSubmitted(jobId, dependency, callSite, listener, properties) =>
+      dagScheduler.handleMapStageSubmitted(jobId, dependency, callSite, listener, properties)
+
+    case StageCancelled(stageId, reason) =>
+      dagScheduler.handleStageCancellation(stageId, reason)
+
+    case JobCancelled(jobId, reason) =>
+      dagScheduler.handleJobCancellation(jobId, reason)
+
+    case JobGroupCancelled(groupId) =>
+      dagScheduler.handleJobGroupCancelled(groupId)
+
+    case AllJobsCancelled =>
+      dagScheduler.doCancelAllJobs()
+
+    case ExecutorAdded(execId, host) =>
+      dagScheduler.handleExecutorAdded(execId, host)
+
+    case ExecutorLost(execId, reason) =>
+      val workerLost = reason match {
+        case SlaveLost(_, true) => true
+        case _ => false
+      }
+      dagScheduler.handleExecutorLost(execId, workerLost)
+
+    case WorkerRemoved(workerId, host, message) =>
+      dagScheduler.handleWorkerRemoved(workerId, host, message)
+... 略
  /** Submits stage, but first recursively submits any missing parents. */
   private def submitStage(stage: Stage) {
     val jobId = activeJobForStage(stage)
