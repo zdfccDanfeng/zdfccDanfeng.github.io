@@ -65,6 +65,11 @@ DAGScheduler 完成stage的划分后基于每个Stage生成TaskSet，并提交�
     assert(partitions.size > 0)
     val func2 = func.asInstanceOf[(TaskContext, Iterator[_]) => _]
     val waiter = new JobWaiter(this, jobId, partitions.size, resultHandler)
+    /** eventProcessLoop是一个DAGSchedulerEventProcessLoop(this)对象，可以把DAGSchedulerEventProcessLoop
+    理解成DAGScheduler的对外的功能接口。它对外隐藏了自己内部实现的细节。无论是内部还是外部消息，DAGScheduler可以共用同一消息处理代码，
+    逻辑清晰，处理方式统一。
+     eventProcessLoop接收各种消息并进行处理，处理的逻辑在其doOnReceive方法中
+     **/
     eventProcessLoop.post(JobSubmitted(
       jobId, rdd, func2, partitions.toArray, callSite, waiter,
       SerializationUtils.clone(properties)))
