@@ -76,6 +76,7 @@ DAGScheduler 完成stage的划分后基于每个Stage生成TaskSet，并提交�
     waiter
   }
   private def doOnReceive(event: DAGSchedulerEvent): Unit = event match {
+     // 当提交的是JobSubmitted，便会通过 dagScheduler.handleJobSubmitted处理此事件。
     case JobSubmitted(jobId, rdd, func, partitions, callSite, listener, properties) =>
       dagScheduler.handleJobSubmitted(jobId, rdd, func, partitions, callSite, listener, properties)
 
