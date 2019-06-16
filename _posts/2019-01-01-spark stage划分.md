@@ -225,7 +225,12 @@ DAGScheduler 完成stage的划分后基于每个Stage生成TaskSet，并提交�
         createShuffleMapStage(shuffleDep, firstJobId)
     }
   }
-/** Find ancestor shuffle dependencies that are not registered in shuffleToMapStage yet */
+/** Find ancestor shuffle dependencies that are not registered in shuffleToMapStage yet 
+
+通过给定的RDD返回其依赖的Stage集合。通过RDD每一个依赖进行遍历，遇到窄依赖就继续往前遍历，
+遇到ShuffleDependency便通过getShuffleMapStage返回一个ShuffleMapStage对象添加到父Stage列表中。
+可见，这里的parentStage是Stage直接依赖的父stages（parentStage也有自己的parentStage），而不是整个DAG的所有stages
+*/
   private def getMissingAncestorShuffleDependencies(
       rdd: RDD[_]): ArrayStack[ShuffleDependency[_, _, _]] = {
     val ancestors = new ArrayStack[ShuffleDependency[_, _, _]]
