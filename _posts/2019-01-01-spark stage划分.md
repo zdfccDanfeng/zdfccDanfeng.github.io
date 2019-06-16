@@ -41,7 +41,36 @@ DAGScheduler 完成stage的划分后基于每个Stage生成TaskSet，并提交�
         throw exception
     }
   }
-  
+  def submitJob[T, U](
+      rdd: RDD[T],
+      func: (TaskContext, Iterator[T]) => U,
+      partitions: Seq[Int],
+      callSite: CallSite,
+      resultHandler: (Int, U) => Unit,
+      properties: Properties): JobWaiter[U] = {
+    // Check to make sure we are not launching a task on a partition that does not exist.
+    val maxPartitions = rdd.partitions.length
+    partitions.find(p => p >= maxPartitions || p < 0).foreach { p =>
+      throw new IllegalArgumentException(
+        "Attempting to access a non-existent partition: " + p + ". " +
+          "Total number of partitions: " + maxPartitions)
+    }
+
+    val jobId = nextJobId.getAndIncrement()
+    if (partitions.size == 0) {
+      // Return immediately if the job is running 0 tasks
+      return new JobWaiter[U](this, jobId, 0, resultHandler)
+    }
+
+    assert(partitions.size > 0)
+    val func2 = func.asInstanceOf[(TaskContext, Iterator[_]) => _]
+    val waiter = new JobWaiter(this, jobId, partitions.size, resultHandler)
+    eventProcessLoop.post(JobSubmitted(
+      jobId, rdd, func2, partitions.toArray, callSite, waiter,
+      SerializationUtils.clone(properties)))
+    waiter
+  }
+
  /** Submits stage, but first recursively submits any missing parents. */
   private def submitStage(stage: Stage) {
     val jobId = activeJobForStage(stage)
